@@ -37,7 +37,7 @@ import {
 } from "../object-cache/index.js";
 import type { CacheHint } from "../query.js";
 import { peekRequestCache, requestCached, setRequestCacheEntry } from "../request-cache.js";
-import { getRequestContext } from "../request-context.js";
+import { getRequestContext, shouldBypassModuleCaches } from "../request-context.js";
 import { chunks, SQL_BATCH_SIZE } from "../utils/chunks.js";
 import { isMissingTableError } from "../utils/db-errors.js";
 import { fetchVisibleTermCounts } from "./term-counts.js";
@@ -200,6 +200,13 @@ export function resetTaxonomyDefsCacheForTests(): void {
 	defsHolder.cache.clear();
 }
 
+/** @internal Test helper: seed the isolate cache with a stale definition set. */
+export function __setTaxonomyDefsCacheForTests(value: TaxonomyDef[]): void {
+	const version = defsHolder.version;
+	const promise = Promise.resolve(value);
+	defsHolder.cache.set("all", { version, promise });
+}
+
 /** Every locale's definition rows, straight from the database (no caching). */
 async function fetchTaxonomyDefRows(): Promise<TaxonomyDef[]> {
 	const db = await getDb();
@@ -217,7 +224,10 @@ async function fetchTaxonomyDefRows(): Promise<TaxonomyDef[]> {
  * rejection evicts the entry so the next caller retries.
  */
 function loadTaxonomyDefRows(): Promise<TaxonomyDef[]> {
-	if (getRequestContext()?.dbIsIsolated === true) {
+	// Isolated databases, route-cache fills, previews, and edit mode must read
+	// live definitions: an isolate copy could belong to another database or
+	// another purge generation.
+	if (getRequestContext()?.dbIsIsolated === true || shouldBypassModuleCaches()) {
 		return fetchTaxonomyDefRows();
 	}
 	const existing = defsHolder.cache.get("all");

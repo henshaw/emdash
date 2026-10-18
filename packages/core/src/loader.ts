@@ -29,7 +29,7 @@ import {
 } from "./i18n/query.js";
 import type { Database } from "./index.js";
 import { primeSeoPanel } from "./page/seo-panel.js";
-import { getRequestContext } from "./request-context.js";
+import { getRequestContext, shouldBypassModuleCaches } from "./request-context.js";
 import { chunks, SQL_BATCH_SIZE } from "./utils/chunks.js";
 import { isMissingColumnError, isMissingTableError } from "./utils/db-errors.js";
 
@@ -400,16 +400,22 @@ function setTaxonomyNamesCache(cache: Map<string, Set<string>> | null): void {
 	taxonomyNamesHolder.cache = cache;
 }
 
+/** @internal Test helper: seed the isolate taxonomy-names cache with a stale map. */
+export function __setTaxonomyNamesCacheForTests(cache: Map<string, Set<string>> | null): void {
+	setTaxonomyNamesCache(cache);
+}
+
 /**
- * Get taxonomy names attached to a collection (cached for the primary DB,
- * bypassed only when the per-request DB is an isolated instance — playground /
- * DO preview). Plain D1 Sessions routing shares schema with the singleton, so
- * the isolate-wide cache stays valid.
+ * Get taxonomy names attached to a collection (cached for the primary DB).
+ * Stored on globalThis so Vite SSR chunk duplication cannot create independent
+ * caches. Bypassed for isolated databases (playground / DO preview), route-cache
+ * fills, previews, and edit mode — any request whose schema may have diverged
+ * from the isolate-wide snapshot must not hydrate with stale taxonomy names.
  */
 async function getTaxonomyNames(db: Kysely<Database>, collection: string): Promise<Set<string>> {
-	const hasIsolatedDb = getRequestContext()?.dbIsIsolated === true;
+	const bypassModuleCaches = shouldBypassModuleCaches();
 
-	if (!hasIsolatedDb && taxonomyNamesHolder.cache) {
+	if (!bypassModuleCaches && taxonomyNamesHolder.cache) {
 		return taxonomyNamesHolder.cache.get(collection) ?? new Set();
 	}
 
@@ -431,7 +437,7 @@ async function getTaxonomyNames(db: Kysely<Database>, collection: string): Promi
 				namesByCollection.set(attachedCollection, names);
 			}
 		}
-		if (!hasIsolatedDb) {
+		if (!bypassModuleCaches) {
 			setTaxonomyNamesCache(namesByCollection);
 		}
 		return namesByCollection.get(collection) ?? new Set();
@@ -439,7 +445,7 @@ async function getTaxonomyNames(db: Kysely<Database>, collection: string): Promi
 		if (!isMissingTableError(error) && !isMissingColumnError(error)) throw error;
 
 		const empty = new Set<string>();
-		if (!hasIsolatedDb) {
+		if (!bypassModuleCaches) {
 			setTaxonomyNamesCache(new Map());
 		}
 		return empty;
@@ -2007,23 +2013,15 @@ export function emdashLoader(): LiveLoader<EntryData, EntryFilter, LoaderCollect
 					nextCursor = encodeSortCursor(sortColumn, lastRow[sortColumn], String(lastRow.id));
 				}
 
-				// Collection-level cache hint uses the most recent updated_at
-				let collectionLastModified: Date | undefined;
-				for (const row of rows) {
-					if (row.updated_at) {
-						const d = new Date(rowStr(row, "updated_at"));
-						if (!collectionLastModified || d > collectionLastModified) {
-							collectionLastModified = d;
-						}
-					}
-				}
-
+				// Collection-level cache hint intentionally omits `lastModified`.
+				// The newest `updated_at` of the returned rows does not move when an
+				// entry is deleted or unpublished, so a conditional refresh after a
+				// missed purge would answer 304 and freeze the stale body.
 				return {
 					entries,
 					nextCursor,
 					cacheHint: {
 						tags: [type],
-						lastModified: collectionLastModified,
 					},
 				};
 			} catch (error) {

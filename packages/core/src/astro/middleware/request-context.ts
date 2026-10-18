@@ -243,14 +243,15 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	}
 
 	// No CMS signals and not an editor. Route-cache renders get a context so
-	// object-cache reads cannot seed a fresh response with stale data; other
-	// requests retain the anonymous fast path.
+	// per-isolate chrome caches (settings, taxonomy defs) and the object cache
+	// cannot seed a fresh response with stale data; other requests retain the
+	// anonymous fast path.
 	if (!hasEditCookie && !hasPreviewToken && !isEditor) {
 		const render = async () => {
 			const response = await next();
 			return toolbarMode === "client" ? injectBootstrap(response) : response;
 		};
-		if (virtualConfig?.objectCacheEnabled && context.cache?.enabled) {
+		if (context.cache?.enabled) {
 			const parent = getRequestContext();
 			if (parent?.siteSettings) parent.siteSettings.live = true;
 			return runWithContext({ ...parent, editMode: false, routeCacheFill: true }, render);

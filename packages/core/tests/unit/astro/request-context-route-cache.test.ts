@@ -18,7 +18,7 @@ import { afterEach, describe, it, expect, vi } from "vitest";
 vi.mock("astro:middleware", () => ({
 	defineMiddleware: (handler: unknown) => handler,
 }));
-vi.mock("virtual:emdash/config", () => ({ default: { objectCacheEnabled: true } }));
+vi.mock("virtual:emdash/config", () => ({ default: { objectCacheEnabled: false } }));
 
 import onRequest from "../../../src/astro/middleware/request-context.js";
 import { __setObjectCacheBackendForTests, cachedQuery } from "../../../src/object-cache/index.js";
