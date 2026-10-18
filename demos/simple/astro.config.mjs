@@ -6,6 +6,8 @@ import { defineConfig, fontProviders } from "astro/config";
 import emdash, { local } from "emdash/astro";
 import { sqlite } from "emdash/db";
 
+import { iconDemoPlugin } from "./src/plugins/icon-demo/index.ts";
+
 export default defineConfig({
 	output: "server",
 	adapter: node({
@@ -23,7 +25,7 @@ export default defineConfig({
 				directory: "./uploads",
 				baseUrl: "/_emdash/api/media/file",
 			}),
-			plugins: [auditLog, mcpSmokePlugin()],
+			plugins: [auditLog, mcpSmokePlugin(), iconDemoPlugin()],
 		}),
 	],
 	fonts: [

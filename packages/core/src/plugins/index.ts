@@ -303,6 +303,7 @@ export type {
 	// Admin types
 	PluginAdminConfig,
 	PluginAdminPage,
+	PluginPageIcon,
 	PluginDashboardWidget,
 	PluginEditorPanel,
 	PluginEditorAction,

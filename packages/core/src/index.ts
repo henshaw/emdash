@@ -418,6 +418,7 @@ export type {
 	RouteContext,
 	PluginAdminConfig,
 	PluginAdminPage,
+	PluginPageIcon,
 	PluginEditorPanel,
 	PluginEditorAction,
 	PluginAdminExports,

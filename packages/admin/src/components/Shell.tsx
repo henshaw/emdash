@@ -4,6 +4,7 @@ import * as React from "react";
 
 import type { AdminManifest } from "../lib/api/client.js";
 import { useCurrentUser } from "../lib/api/current-user";
+import type { NavIconSource } from "../lib/nav-icon.js";
 import { getLocaleDir } from "../locales/config.js";
 import { useLocale } from "../locales/useLocale.js";
 import { AdminCommandPalette } from "./AdminCommandPalette";
@@ -30,7 +31,7 @@ export interface ShellProps {
 			string,
 			{
 				package?: string;
-				adminPages?: Array<{ path: string; label?: string; icon?: string; group?: string }>;
+				adminPages?: Array<{ path: string; label?: string; icon?: NavIconSource; group?: string }>;
 			}
 		>;
 		taxonomies: Array<{

@@ -136,6 +136,7 @@ import type {
 	ContentWriteInput,
 	PluginContentCreateCallback,
 	VersionedContentItem,
+	PluginPageIcon,
 } from "./plugins/types.js";
 import { normalizePluginCapabilities, warnDeprecatedPluginCapabilities } from "./plugins/types.js";
 import { recordSchedulerHeartbeatSafely } from "./scheduler-health.js";
@@ -359,7 +360,7 @@ export interface SandboxedPluginEntry {
 	/** Hook declarations this plugin implements */
 	hooks?: PluginManifest["hooks"];
 	/** Admin pages */
-	adminPages?: Array<{ path: string; label?: string; icon?: string; group?: string }>;
+	adminPages?: Array<{ path: string; label?: string; icon?: PluginPageIcon; group?: string }>;
 	/** Dashboard widgets */
 	adminWidgets?: Array<{ id: string; title?: string; size?: string }>;
 	/** Saved-entry Block Kit panels. */
@@ -3083,7 +3084,7 @@ export class EmDashRuntime {
 				enabled?: boolean;
 				sandboxed?: boolean;
 				adminMode?: "react" | "blocks" | "none";
-				adminPages?: Array<{ path: string; label?: string; icon?: string; group?: string }>;
+				adminPages?: Array<{ path: string; label?: string; icon?: PluginPageIcon; group?: string }>;
 				dashboardWidgets?: Array<{
 					id: string;
 					title?: string;

@@ -1965,10 +1965,26 @@ export interface PluginMcpConfig {
 /**
  * Admin page definition
  */
+/**
+ * An admin page icon: a Phosphor icon name (kebab-case, e.g. `calendar-blank`),
+ * or SVG path data drawn in the current text color.
+ */
+export type PluginPageIcon =
+	| string
+	| {
+			/** SVG viewBox. Defaults to "0 0 256 256", Phosphor's grid. */
+			viewBox?: string;
+			/** Path data, filled with the current text color. */
+			path: string | string[];
+			/** Path data for the active state. Defaults to `path`. */
+			activePath?: string | string[];
+			fillRule?: "nonzero" | "evenodd";
+	  };
+
 export interface PluginAdminPage {
 	path: string;
 	label: string;
-	icon?: string;
+	icon?: PluginPageIcon;
 	/**
 	 * Admin sidebar folder. Pages sharing a group with a collection shown in
 	 * the sidebar join that folder; pages with any other group share a folder

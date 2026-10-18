@@ -37,7 +37,7 @@ export type { MediaProviderDescriptor };
 export interface PluginAdminPage {
 	path: string;
 	label: string;
-	icon?: string;
+	icon?: import("../../plugins/types.js").PluginPageIcon;
 }
 
 /**

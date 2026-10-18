@@ -1,3 +1,5 @@
+import type { NavIconSource } from "./nav-icon.js";
+
 /**
  * Pure grouping for the admin sidebar: entries that declare the same `group`
  * fold into one collapsible folder positioned where the group first appears.
@@ -6,8 +8,8 @@
 export interface GroupableNavItem {
 	/** Folder label shared by every member; unset keeps the item inline. */
 	group?: string;
-	/** Icon name a folder may inherit when it has no icon of its own. */
-	iconName?: string;
+	/** Icon a folder may inherit when it has no icon of its own. */
+	iconName?: NavIconSource;
 	/** Members of one folder sort by rank first (stable), then input order. */
 	groupRank?: number;
 }
@@ -15,7 +17,7 @@ export interface GroupableNavItem {
 export interface NavFolder<T> {
 	kind: "folder";
 	label: string;
-	iconName?: string;
+	iconName?: NavIconSource;
 	items: T[];
 }
 

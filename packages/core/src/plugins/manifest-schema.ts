@@ -19,6 +19,7 @@ import {
 } from "@emdash-cms/plugin-types";
 import { z } from "zod";
 
+import { pluginPageIconSchema } from "./page-icon.js";
 import type { PluginManifest } from "./types.js";
 
 // ── Enum values (must stay in sync with types.ts) ───────────────
@@ -236,7 +237,7 @@ const settingFieldSchema = z.discriminatedUnion("type", [
 const adminPageSchema = z.object({
 	path: z.string(),
 	label: z.string(),
-	icon: z.string().optional(),
+	icon: pluginPageIconSchema.optional(),
 	group: z.string().trim().min(1).max(100).optional(),
 });
 

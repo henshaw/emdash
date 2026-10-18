@@ -109,7 +109,7 @@ export interface ManifestPlugin {
 	adminPages?: Array<{
 		path: string;
 		label?: string;
-		icon?: string;
+		icon?: import("../plugins/types.js").PluginPageIcon;
 		group?: string;
 	}>;
 	dashboardWidgets?: Array<{
