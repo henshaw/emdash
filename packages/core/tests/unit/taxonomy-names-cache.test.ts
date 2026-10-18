@@ -84,7 +84,7 @@ describe("taxonomy names isolate cache", () => {
 	});
 
 	it("uses the isolate taxonomy-names cache outside of route-cache fills", async () => {
-		const { term, post } = await seedPostWithTag();
+		const { term } = await seedPostWithTag();
 		__setTaxonomyNamesCacheForTests(new Map<string, Set<string>>());
 		delegateToLoader();
 
