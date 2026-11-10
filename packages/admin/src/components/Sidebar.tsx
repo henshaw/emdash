@@ -14,6 +14,7 @@ import { formatAdminVersion } from "../lib/admin-version.js";
 import { useAdminLayout } from "../lib/api/admin-layout.js";
 import { fetchCommentCounts } from "../lib/api/comments";
 import { useCurrentUser } from "../lib/api/current-user";
+import type { NavIconSource } from "../lib/nav-icon.js";
 import { resolvePluginPagePath, usePluginAdmins, type PluginAdmins } from "../lib/plugin-context";
 import {
 	groupNavItems,
@@ -114,7 +115,7 @@ export interface SidebarNavProps {
 				adminPages?: Array<{
 					path: string;
 					label?: string;
-					icon?: string;
+					icon?: NavIconSource;
 					group?: string;
 				}>;
 				dashboardWidgets?: Array<{ id: string; title?: string }>;

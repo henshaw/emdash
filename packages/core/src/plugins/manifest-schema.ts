@@ -15,6 +15,7 @@ import {
 	isJsonPostRouteContract,
 	manifestRouteEntrySchema as sharedManifestRouteEntrySchema,
 	normalizeManifestRoute as normalizeSharedManifestRoute,
+	pluginPageIconSchema,
 	routeNameSchema,
 } from "@emdash-cms/plugin-types";
 import { z } from "zod";
@@ -236,7 +237,7 @@ const settingFieldSchema = z.discriminatedUnion("type", [
 const adminPageSchema = z.object({
 	path: z.string(),
 	label: z.string(),
-	icon: z.string().optional(),
+	icon: pluginPageIconSchema.optional(),
 	group: z.string().trim().min(1).max(100).optional(),
 });
 

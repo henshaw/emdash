@@ -5,6 +5,7 @@
  * changes, so callers can skip a save by identity.
  */
 
+import type { NavIconSource } from "./nav-icon.js";
 import type { NavEntry } from "./sidebar-groups.js";
 
 export type LayoutScope = "nav" | "editor";
@@ -168,7 +169,7 @@ export interface ArrangedNavFolder<T extends { id: string }> extends ArrangedFla
 	readonly kind: "folder";
 	readonly id: string;
 	readonly label: string;
-	readonly iconName?: string;
+	readonly iconName?: NavIconSource;
 	readonly items: readonly ArrangedRow<T>[];
 }
 

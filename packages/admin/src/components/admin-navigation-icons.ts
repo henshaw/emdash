@@ -42,6 +42,8 @@ import {
 import type { Icon } from "@phosphor-icons/react";
 import * as React from "react";
 
+import { type NavIconSource, type ParsedPathIcon, parsePathIcon } from "../lib/nav-icon.js";
+
 /** Shared icon vocabulary for first-party admin entities and navigation surfaces. */
 export const ADMIN_NAV_ICONS = {
 	dashboard: SquaresFour,
@@ -144,11 +146,15 @@ function isIconComponent(value: unknown): value is React.ComponentType<{ classNa
  * code-split. Missing or unknown names render `fallback`.
  */
 export function resolveNavIcon(
-	name?: string,
+	name?: NavIconSource,
 	fallback: React.ComponentType = ADMIN_NAV_ICONS.plugins,
 ): React.ElementType {
 	if (!name) {
 		return fallback;
+	}
+	if (typeof name !== "string") {
+		const icon = parsePathIcon(name);
+		return icon ? pathIconComponent(icon) : fallback;
 	}
 	if (Object.hasOwn(PLUGIN_NAV_ICON_MAP, name)) {
 		return PLUGIN_NAV_ICON_MAP[name]!;
@@ -169,4 +175,41 @@ export function resolveNavIcon(
 		perFallback.set(componentName, icon);
 	}
 	return icon;
+}
+
+const pathIconCache = new Map<string, React.ElementType>();
+
+/** Draws a plugin's path icon like a Phosphor icon: current text color, 1em by default, filled shape when active. */
+function pathIconComponent(icon: ParsedPathIcon): React.ElementType {
+	const key = JSON.stringify(icon);
+	let component = pathIconCache.get(key);
+	if (!component) {
+		component = function PathNavIcon({
+			className,
+			weight,
+		}: {
+			className?: string;
+			weight?: string;
+		}) {
+			const paths = weight === "fill" ? icon.activePaths : icon.paths;
+			return React.createElement(
+				"svg",
+				{
+					xmlns: "http://www.w3.org/2000/svg",
+					viewBox: icon.viewBox,
+					width: "1em",
+					height: "1em",
+					fill: "currentColor",
+					className,
+					"aria-hidden": true,
+					focusable: false,
+				},
+				paths.map((d, index) =>
+					React.createElement("path", { key: index, d, fillRule: icon.fillRule }),
+				),
+			);
+		};
+		pathIconCache.set(key, component);
+	}
+	return component;
 }

@@ -11,6 +11,7 @@ import { z } from "zod";
 
 import { capabilitiesToDeclaredAccess, declaredAccessToCapabilities } from "./index.js";
 import type { PluginManifest } from "./index.js";
+import { pluginPageIconSchema } from "./page-icon.js";
 import {
 	isJsonPostRouteContract,
 	manifestRouteEntrySchema,
@@ -225,7 +226,7 @@ const settingFieldSchema = z.discriminatedUnion("type", [
 const adminPageSchema = z.object({
 	path: z.string(),
 	label: z.string(),
-	icon: z.string().optional(),
+	icon: pluginPageIconSchema.optional(),
 	group: z.string().trim().min(1).max(100).optional(),
 });
 

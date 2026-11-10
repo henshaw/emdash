@@ -6,6 +6,7 @@ import type { Element } from "@emdash-cms/blocks";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 
+import type { NavIconSource } from "../nav-icon.js";
 import type { EditorDraftAccessDeclaration } from "../sandboxed-editor-extensions.js";
 
 export const API_BASE = "/_emdash/api";
@@ -221,7 +222,7 @@ export interface AdminManifest {
 			adminPages?: Array<{
 				path: string;
 				label?: string;
-				icon?: string;
+				icon?: NavIconSource;
 				group?: string;
 			}>;
 			dashboardWidgets?: Array<{
